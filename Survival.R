@@ -9,7 +9,7 @@ tumors <- tumors[tumors$LocalisedRCC == "1", ]
 
 # Filtering
 tumors <- tumors[tumors$VHL == "1", ]
-tumors <- tumors[tumors$Stage == "I", ]
+tumors <- tumors[tumors$Stage == "II", ]
 
 # Define the 5-year DFS
 max_time <- 5
@@ -20,10 +20,10 @@ tumors$DFSEvent_5yr <- ifelse(tumors$DFSYears > max_time, 0, tumors$DFSEvent)  #
 tumorSurv_5yr <- Surv(time = tumors$DFSYears_5yr, event = tumors$DFSEvent_5yr)
 
 # Fit the Kaplan-Meier survival model
-tumorKM_5yr <- survfit(tumorSurv_5yr ~ KDM5C_SETD2, data = tumors, type = "kaplan-meier")
+tumorKM_5yr <- survfit(tumorSurv_5yr ~ KDM5C_SETD2_4, data = tumors, type = "kaplan-meier")
 
 # Perform a log-rank test
-logrank_test_5yr <- survdiff(tumorSurv_5yr ~ KDM5C_SETD2, data = tumors)
+logrank_test_5yr <- survdiff(tumorSurv_5yr ~ KDM5C_SETD2_4, data = tumors)
 
 # Calculate the p-value for the log-rank test
 logrank_pval_5yr <- 1 - pchisq(logrank_test_5yr$chisq, df = length(logrank_test_5yr$n) - 1)
@@ -50,6 +50,23 @@ ggsurvplot(
 )
 
 
+ggsurvplot(
+  tumorKM_5yr,
+  conf.int = FALSE,
+  pval = paste("p =", signif(logrank_pval_5yr, 3)),
+  pval.coord = c(2.8, 0.8),  # Add the p-value to the plot
+  risk.table = TRUE,     # Enable the risk table at the bottom
+  legend.labs = c("KDM5C only", "SETD2 only", "None"),
+  legend = c(0.15, 0.2),
+  break.time.by = 1,
+  legend.title = "Subtype",
+  censor.shape = "+",
+  censor.size = 5,
+  palette = c("olivedrab3", "steelblue1", "azure4"),
+  xlab = "Survival (years)",
+  ylab = "Proportion surviving"
+)
+
 
 # Plot the Kaplan-Meier curve with the p-value and risk table
 # 4 curves: Both, Gene1, Gene2, None
@@ -59,7 +76,7 @@ ggsurvplot(
   pval = paste("p =", signif(logrank_pval_5yr, 3)),
   pval.coord = c(3, 1),  # Add the p-value to the plot
   risk.table = TRUE,     # Enable the risk table at the bottom
-  legend.labs = c("BAP1_TP53", "BAP1 only", "TP53 only", "None"),
+  legend.labs = c("KDM5C_SETD2", "KDM5C only", "SETD2 only", "None"),
   legend = c(0.15, 0.2),
   break.time.by = 1,
   legend.title = "Subtype",
@@ -78,7 +95,7 @@ ggsurvplot(
   pval = paste("p =", signif(logrank_pval_5yr, 3)),
   pval.coord = c(4, 0.98),# Add the p-value to the plot
   risk.table = TRUE, # Enable the risk table at the bottom
-  legend.labs = c("KDM5C_SETD2", "Other"),
+  legend.labs = c("KDM5C_SETD2_4", "Other"),
   legend = c(0.13, 0.2),
   break.time.by = 1,
   legend.title = "Subtype",
