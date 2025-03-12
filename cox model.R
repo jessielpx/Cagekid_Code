@@ -19,7 +19,7 @@ tumors <- tumors[tumors$VHL == "1", ]
 #tumors <- tumors[tumors$Stage == "II", ]
 
 #set reference
-tumors$KDM5C_SETD2 <- factor(tumors$KDM5C_SETD2, levels = c("Other", "Both"))
+tumors$KDM5C_SETD2_4 <- factor(tumors$KDM5C_SETD2_4, levels = c("ZNone", "KDM5C_only", "SETD2_only", "Co-occur"))
 tumors$Sex <- factor(tumors$Sex, levels = c("Female", "Male"))
 tumors$Age_raw <- as.numeric(tumors$Age_raw)
 tumors$Stage <- factor(tumors$Stage, levels = c("I", "II", "III"))
@@ -41,7 +41,7 @@ tumors$Co_occurrence <- factor(
 
 
 # Fit the multivariate Cox Proportional Hazards Model
-cox_model <- coxph(surv_object ~ KDM5C_SETD2+Age_raw+Sex, data = tumors)
+cox_model <- coxph(surv_object ~ KDM5C_SETD2_4+Age_raw+Sex, data = tumors)
 
 # View model summary
 summary(cox_model)

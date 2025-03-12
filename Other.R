@@ -127,6 +127,7 @@ tumors_clean <- tumors[tumors$VHL %in% c("1", "0"), ]
 head(tumors_clean)
 
 tumors_clean <- tumors_clean[tumors_clean$VHL == "1", ]
+tumors_clean <- tumors_clean[tumors_clean$Sex == "Male", ]
 
 # Now proceed with the rest of the analysis using the cleaned data
 # Contingency table for Stage and VHL
@@ -208,12 +209,12 @@ library(readxl)
 tumors <- read_excel('/Users/jessie/Desktop/Cagekid/Cagekid_All.xlsx', sheet = 'Cagekid_clin')
 
 
-tumors <- tumors[tumors$VHL == "1", ]
+#tumors <- tumors[tumors$VHL == "1", ]
 # Ensure Stage is a factor and ordered
 tumors$Stage <- factor(tumors$Stage, levels = c("I", "II", "III", "IV"))
 
 # Filter out NA values in tumor size and VHL status
-tumors_clean <- tumors[!is.na(tumors$BAP1) & !is.na(tumors$TumourSize_raw), ]
+tumors_clean <- tumors[!is.na(tumors$KDM5C_SETD2_4) & !is.na(tumors$TumourSize_raw), ]
 
 # Initialize list to store plots
 tumor_size_plots <- list()
@@ -237,21 +238,21 @@ for (stage in levels(tumors_clean$Stage)) {
   
   # Perform t-test or Wilcoxon test based on normality
   if (shapiro_test$p.value > 0.05) {
-    t_test_size <- t.test(TumourSize_raw ~ BAP1, data = tumors_stage)
+    t_test_size <- t.test(TumourSize_raw ~ KDM5C_SETD2_4, data = tumors_stage)
     print(t_test_size)
   } else {
-    wilcox_test_size <- wilcox.test(TumourSize_raw ~ BAP1, data = tumors_stage)
+    wilcox_test_size <- wilcox.test(TumourSize_raw ~ KDM5C_SETD2_4, data = tumors_stage)
     print(wilcox_test_size)
   }
   
   # Create a boxplot for Tumor Size by VHL status
-  tumors_stage_filtered <- tumors_stage[tumors_stage$BAP1 %in% c(0, 1), ]
+  tumors_stage_filtered <- tumors_stage[tumors_stage$KDM5C_SETD2_4 %in% c(0, 1), ]
   
-  tumor_size_plot <- ggplot(tumors_stage_filtered, aes(x = factor(BAP1), y = TumourSize_raw, fill = factor(BAP1))) +
+  tumor_size_plot <- ggplot(tumors_stage_filtered, aes(x = factor(KDM5C_SETD2_4), y = TumourSize_raw, fill = factor(KDM5C_SETD2_4))) +
     geom_boxplot() +
-    labs(x = "BAP1 Mutation Status", y = "Tumor Size (mm)", title = paste("Tumor Size - Stage", stage)) +
-    scale_x_discrete(labels = c("0" = "BAP1wt", "1" = "BAP1mut")) +  # Modify x-axis labels
-    scale_fill_manual(values = c("blue", "red"), labels = c("BAP1wt", "BAP1mut")) +  # Modify legend labels
+    labs(x = "KDM5C_SETD2_4 Mutation Status", y = "Tumor Size (mm)", title = paste("Tumor Size - Stage", stage)) +
+    scale_x_discrete(labels = c("0" = "KDM5C_SETD2_4wt", "1" = "KDM5C_SETD2_4mut")) +  # Modify x-axis labels
+    scale_fill_manual(values = c("blue", "red"), labels = c("KDM5C_SETD2_4wt", "KDM5C_SETD2_4mut")) +  # Modify legend labels
     theme_minimal()
   
 
@@ -270,7 +271,7 @@ if (length(tumor_size_plots) > 0) {
 
 
 # Create a contingency table
-contingency_table <- matrix(c(30, 101, 190, 61), nrow = 2, byrow = TRUE)
+contingency_table <- matrix(c(7, 94, 12, 606), nrow = 2, byrow = TRUE)
 
 # Perform Fisher's exact test
 fisher_result <- fisher.test(contingency_table)
